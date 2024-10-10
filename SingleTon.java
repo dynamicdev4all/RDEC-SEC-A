@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class SingleTon {
     public static void main(String[] args) {
-        Car car1 = new Car(4, 6, "Swift");
+        Car car1 = new Car(  4, 6, "Swift");
         System.out.println(car1.name);
         System.out.println(car1.noOfSeat);
         System.out.println(car1.wheelCount);
