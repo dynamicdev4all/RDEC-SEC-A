@@ -11,13 +11,25 @@ mongoose
   .then(() => {
     console.log("Database connection Success");
   })
-  .catch(() => {
-    console.log("Some issue in connection");
+  .catch((err) => {
+    console.log("Some issue in connection ", err);
   });
 
 // app.use(express.static);
 
 const path = require("path");
+const { emit } = require("process");
+
+app.use(express.urlencoded({ extended: true }));
+
+const userSchema = new mongoose.Schema({
+  userName: String,
+  email: String,
+  passsword: String,
+  isActive: Boolean,
+});
+
+const userModel = mongoose.model("User", userSchema);
 
 //this is the root route or home route
 app.get("/", (req, res) => {
@@ -29,13 +41,48 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "login.html"));
 });
-app.post("/create-new-user", (req, res) => {
+app.get("/dashboard", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "dashboard.html"));
+});
+app.post("/create-new-user", async (req, res) => {
+  const { username, email, password } = req.body;
+  try {
+    const user = await userModel.findOne({ email: email });
+    if (user) {
+      console.log("This Email is already in use");
+    } else {
+      const newUser = new userModel({
+        userName: username,
+        email: email,
+        passsword: password,
+        isActive: false,
+      });
+      await newUser.save();
+      console.log("register success");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+app.post("/login-user", async (req, res) => {
+  const { email, password } = req.body;
   console.log(req.body);
-  console.log(res.body);
-  // ({ username, email, password } = req.body);
-  // console.log(username);
-  // console.log(email);
-  // console.log(password);
+  try {
+    const user = await userModel.findOne({ email: email });
+    if (user) {
+      if (user.passsword == password && user.isActive) {
+        res.redirect("/dashboard");
+      } else if (user.passsword == password && !user.isActive) {
+        console.log("Please verify your email");
+      } else if (user.passsword != password) {
+        console.log("Password is invalid ");
+      }
+    } else {
+      console.log("The user does not exist");
+    }
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.listen(1234, () => {
