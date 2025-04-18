@@ -28,6 +28,9 @@ app.post("/login-user", async (req, res) => {
   const { email, password } = req.body;
   userLogin(email, password)
 });
+app.get("/verifyemail", (req, res) => {
+  console.log("DEMO")
+});
 
 app.listen(1234, () => {
   console.log("the server is running");

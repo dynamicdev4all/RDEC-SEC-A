@@ -1,4 +1,5 @@
 const userModel = require("../models/userModel");
+const sendEmail = require("../services/sendEmail");
 
 const userRegister = async(username, email, password)=>{
     try {
@@ -12,8 +13,9 @@ const userRegister = async(username, email, password)=>{
             passsword: password,
             isActive: false,
           });
-          await newUser.save();
+          // await newUser.save();
           console.log("register success");
+          sendEmail(email, username)
         }
       } catch (error) {
         console.log(error);
